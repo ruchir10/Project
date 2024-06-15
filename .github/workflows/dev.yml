@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install unzip
-        run: sudo apt-get install unzip -y
-
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install unzip
+        run: sudo apt-get install unzip -y
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -27,13 +27,19 @@ jobs:
           terraform_wrapper: true
 
       - name: Terraform Init
-        run: terraform init
+        run: |
+          cd terraform  # Assuming your .tf files are in a 'terraform' directory
+          terraform init
 
       - name: Terraform Validate
-        run: terraform validate
+        run: |
+          cd terraform
+          terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: |
+          cd terraform
+          terraform plan -out=tfplan
 
       - name: Copy files to EC2
         env:
