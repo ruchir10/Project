@@ -1,4 +1,4 @@
-name: Deploy to EC2 (Dev Branch)
+name: Deploy Terraform to EC2 (Dev Branch)
 
 on:
   push:
@@ -23,12 +23,23 @@ jobs:
           cli_config_credentials_hostname: app.terraform.io
           terraform_wrapper: true
 
+      - name: Check Terraform Configuration
+        run: |
+          if [ ! -d "terraform" ]; then
+            echo "Error: 'terraform' directory not found"
+            exit 1
+          fi
+
       - name: Terraform Init and Plan
         run: |
-          cd terraform  # Assuming your .tf files are in a 'terraform' directory
+          cd terraform
           terraform init
           terraform validate
           terraform plan -out=tfplan
+
+      - name: Copy Terraform plan to GitHub workspace
+        if: success()
+        run: mv terraform/tfplan $GITHUB_WORKSPACE/tfplan
 
       - name: Copy files to EC2
         if: github.ref == 'refs/heads/dev'
@@ -40,5 +51,5 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > key.pem
           chmod 600 key.pem
-          scp -i key.pem -r . $EC2_USER@$EC2_HOST:$DEST_PATH
+          scp -i key.pem -r $GITHUB_WORKSPACE/tfplan $EC2_USER@$EC2_HOST:$DEST_PATH
           rm key.pem
