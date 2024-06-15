@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy to EC2 (Dev Branch)
 
 on:
   push:
@@ -23,19 +23,11 @@ jobs:
           cli_config_credentials_hostname: app.terraform.io
           terraform_wrapper: true
 
-      - name: Terraform Init
+      - name: Terraform Init and Plan
+        working-directory: terraform  # Assuming your .tf files are in a 'terraform' directory
         run: |
-          cd terraform  # Assuming your .tf files are in a 'terraform' directory
           terraform init
-
-      - name: Terraform Validate
-        run: |
-          cd terraform
           terraform validate
-
-      - name: Terraform Plan
-        run: |
-          cd terraform
           terraform plan -out=tfplan
 
       - name: Copy files to EC2
