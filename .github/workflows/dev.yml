@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        # Ensure correct path is set if your repository has nested directories
+        with:
+          path: 'Project'  # Adjust if your repository content is nested
 
       - name: Install SSH client
         run: sudo apt-get install openssh-client -y
@@ -45,5 +48,5 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > key.pem
           chmod 600 key.pem
-          scp -i key.pem -r . $EC2_USER@$EC2_HOST:$DEST_PATH
+          scp -i key.pem -r ./Project $EC2_USER@$EC2_HOST:$DEST_PATH
           rm key.pem
