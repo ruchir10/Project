@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          path: 'Project'  # Adjust if your repository content is nested
 
       - name: Set up SSH key
         env:
@@ -26,9 +28,9 @@ jobs:
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ubuntu
-          DEST_PATH: /home/ubuntu/demo
+          DEST_PATH: ~/demo  # Adjust destination path on EC2 as needed
         run: |
-          scp -i ~/.ssh/id_rsa -r ./Project $EC2_USER@$EC2_HOST:$DEST_PATH
+          scp -i ~/.ssh/id_rsa -r ./Project/* $EC2_USER@$EC2_HOST:$DEST_PATH
           if [ $? -eq 0 ]; then
             echo "Files copied successfully."
           else
