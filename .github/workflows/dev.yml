@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Install unzip
         run: sudo apt-get install unzip -y
@@ -24,8 +24,8 @@ jobs:
           terraform_wrapper: true
 
       - name: Terraform Init and Plan
-        working-directory: terraform  # Assuming your .tf files are in a 'terraform' directory
         run: |
+          cd terraform  # Assuming your .tf files are in a 'terraform' directory
           terraform init
           terraform validate
           terraform plan -out=tfplan
