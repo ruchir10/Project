@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          path: 'Project'  # Adjust if your repository content is nested
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -20,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: Project  # Adjust if your package.json is in a nested directory
+        working-directory: Project
 
       - name: Build application (if applicable)
         run: npm run build --if-present
