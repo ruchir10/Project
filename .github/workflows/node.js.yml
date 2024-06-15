@@ -1,0 +1,52 @@
+name: Deploy Node.js App to EC2 (Dev Branch)
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        # Ensure correct path is set if your repository has nested directories
+        with:
+          path: 'Project'  # Adjust if your repository content is nested
+
+      - name: Install SSH client
+        run: sudo apt-get install openssh-client -y
+
+      - name: Install Node.js and npm (if not already installed)
+        run: |
+          if ! command -v node &> /dev/null; then
+            curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          fi
+
+      - name: Install npm (if not already installed)
+        run: |
+          if ! command -v npm &> /dev/null; then
+            sudo apt-get install -y npm
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application (if applicable)
+        run: npm run build --if-present
+
+      - name: Copy files to EC2
+        if: github.ref == 'refs/heads/dev'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ubuntu
+          DEST_PATH: ~/demo
+        run: |
+          echo "$SSH_PRIVATE_KEY" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -r ./Project $EC2_USER@$EC2_HOST:$DEST_PATH
+          rm key.pem
