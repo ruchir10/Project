@@ -23,7 +23,7 @@ jobs:
           cli_config_credentials_hostname: app.terraform.io
           terraform_wrapper: true
 
-      - name: Check Terraform Configuration
+      - name: Check if Terraform directory exists
         run: |
           if [ ! -d "terraform" ]; then
             echo "Error: 'terraform' directory not found"
