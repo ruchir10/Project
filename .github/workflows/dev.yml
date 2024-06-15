@@ -16,34 +16,24 @@ jobs:
       - name: Install SSH client
         run: sudo apt-get install openssh-client -y
 
-      - name: Check if Node.js is installed
-        id: check-node
+      - name: Install Node.js and npm (if not already installed)
         run: |
           if ! command -v node &> /dev/null; then
-            echo "Node.js is not installed"
-            echo "Installing Node.js..."
             curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
             sudo apt-get install -y nodejs
-          else
-            echo "Node.js $(node -v) is already installed"
           fi
 
-      - name: Check if npm is installed
-        id: check-npm
+      - name: Install npm (if not already installed)
         run: |
           if ! command -v npm &> /dev/null; then
-            echo "npm is not installed"
-            echo "Installing npm..."
             sudo apt-get install -y npm
-          else
-            echo "npm $(npm -v) is already installed"
           fi
 
-      - name: Set up Node.js environment
-        if: steps.check-node.outcome == 'success' && steps.check-npm.outcome == 'success'
-        run: |
-          npm ci
-          npm run build --if-present
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application (if applicable)
+        run: npm run build --if-present
 
       - name: Copy files to EC2
         if: github.ref == 'refs/heads/dev'
